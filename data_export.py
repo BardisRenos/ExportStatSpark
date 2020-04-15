@@ -25,11 +25,11 @@ class StatExport:
     dict_Total_Length_Col_Values = {}
     lis_of_types = {}
 
-    cnxn = pyodbc.connect(Driver='{SQL Server}', Server='MCSQLCLU02',
-                          Database='CISCOMMON', Trusted_Connection='yes')
+    cnxn = pyodbc.connect(Driver='{SQL Server}', Server='SERVER_NAME',
+                          Database='DATABASE_NAME', Trusted_Connection='yes')
 
     def the_main_tables(self):
-        sqlTables = "SELECT name FROM CISCOMMON.sys.tables where name LIKE 'ECPYDPT_%' AND  is_ms_shipped=0 ORDER BY name " \
+        sqlTables = "SELECT name FROM DATABASE_NAME.sys.tables where name LIKE 'ECPYDPT_%' AND  is_ms_shipped=0 ORDER BY name " \
                     "ASC; "
 
         df = pd.read_sql(sqlTables, self.cnxn)
@@ -64,7 +64,7 @@ class StatExport:
 
         for i in self.the_main_tables()['name']:
             mssql_df = spark.read.format("jdbc") \
-                .option("url", "jdbc:sqlserver://MCSQLCLU02:1433;databaseName=CISCOMMON;integratedSecurity=true") \
+                .option("url", "jdbc:sqlserver://SERVER_NAME:1433;databaseName=DATABASE_NAME;integratedSecurity=true") \
                 .option("dbtable", "[" + i + "]") \
                 .option("driver", 'com.microsoft.sqlserver.jdbc.SQLServerDriver').load()
 
