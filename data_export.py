@@ -73,17 +73,13 @@ class StatExport:
             self.dict_Col_Name[i] = mssql_df.columns
 
             for k in mssql_df.columns:
-                avg_value = str(mssql_df.select(
-                    avg(length(col(k)))).collect()[0][0])
-                self.dict_AVG_Value.setdefault(i, []).append(
-                    avg_value.split(".")[0])
+                avg_value = str(mssql_df.select(avg(length(col(k)))).collect()[0][0])
+                self.dict_AVG_Value.setdefault(i, []).append(avg_value.split(".")[0])
 
-                min_value = mssql_df.select(
-                    min(length(col(k)))).collect()[0][0]
+                min_value = mssql_df.select(min(length(col(k)))).collect()[0][0]
                 self.dict_MIN_value.setdefault(i, []).append(min_value)
 
-                max_value = mssql_df.select(
-                    max(length(col(k)))).collect()[0][0]
+                max_value = mssql_df.select(max(length(col(k)))).collect()[0][0]
                 self.dict_MAX_Value.setdefault(i, []).append(max_value)
 
                 null_value = mssql_df.where(col(k).isNull()).count()
@@ -93,28 +89,22 @@ class StatExport:
                 self.dict_Empty_Value.setdefault(i, []).append(empty_value)
 
                 total_valid_values = mssql_df.count() - (empty_value + null_value)
-                self.dict_Total_Valid_Value.setdefault(
-                    i, []).append(total_valid_values)
+                self.dict_Total_Valid_Value.setdefault(i, []).append(total_valid_values)
 
-                percentage_completion = (
-                    (total_valid_values / mssql_df.count()) * 100) if mssql_df.count() != 0 else 0
-                self.dict_Percentage_Comp.setdefault(
-                    i, []).append(int(percentage_completion))
+                percentage_completion = ((total_valid_values / mssql_df.count()) * 100) if mssql_df.count() != 0 else 0
+                self.dict_Percentage_Comp.setdefault(i, []).append(int(percentage_completion))
 
                 type_value = self.lis_of_types[k]
                 self.dict_Category_Of_data.setdefault(i, []).append(type_value)
 
-                self.dict_Total_Length_Values.setdefault(
-                    i, []).append(mssql_df.count())
-                self.dict_Total_Length_Col_Values.setdefault(
-                    i, []).append(len(mssql_df.columns))
+                self.dict_Total_Length_Values.setdefault(i, []).append(mssql_df.count())
+                self.dict_Total_Length_Col_Values.setdefault(i, []).append(len(mssql_df.columns))
 
                 print(i, k, mssql_df.count(), avg_value, min_value, max_value, null_value, empty_value,
                       total_valid_values, percentage_completion, self.lis_of_types[k])
 
     def file_export(self, app_name, num_tables, table_size, dict_col_name, dict_avg_value, dict_min_value, dict_max_value,
-                    dict_null_value,
-                    dict_empty_value, dict_total_valid_value, dict_percentage_comp, dict_category_of_data,
+                    dict_null_value, dict_empty_value, dict_total_valid_value, dict_percentage_comp, dict_category_of_data,
                     dict_total_values, dict_total_columns_values):
 
         self.extract_data()
@@ -124,8 +114,7 @@ class StatExport:
         dictAll.update(num_tables)
         dictAll.update(table_size)
 
-        writer = pd.ExcelWriter(
-            r'C:\Users\renos.bardis\Desktop\E-project\StatE-project.xlsx')
+        writer = pd.ExcelWriter(r'C:\Users\renos.bardis\Desktop\E-project\StatE-project.xlsx')
         dfTotal = pd.DataFrame(data=dictAll)
         dfTotal.to_excel(writer, index=None, header=True, sheet_name="Info")
 
@@ -135,59 +124,47 @@ class StatExport:
 
         for key, value in dict_col_name.items():
             dfdictColName = pd.DataFrame(data=value, columns=[header[0]])
-            dfdictColName.to_excel(
-                writer, sheet_name=key, startcol=0, header=True, index=False)
+            dfdictColName.to_excel(writer, sheet_name=key, startcol=0, header=True, index=False)
 
         for key, value in dict_avg_value.items():
             dfdictAvgValue = pd.DataFrame(data=value, columns=[header[1]])
-            dfdictAvgValue.to_excel(
-                writer, sheet_name=key, startcol=1, header=True, index=False)
+            dfdictAvgValue.to_excel(writer, sheet_name=key, startcol=1, header=True, index=False)
 
         for key, value in dict_min_value.items():
             dfdictMinValue = pd.DataFrame(data=value, columns=[header[2]])
-            dfdictMinValue.to_excel(
-                writer, sheet_name=key, startcol=2, header=True, index=False)
+            dfdictMinValue.to_excel(writer, sheet_name=key, startcol=2, header=True, index=False)
 
         for key, value in dict_max_value.items():
             dfdictMaxValue = pd.DataFrame(data=value, columns=[header[3]])
-            dfdictMaxValue.to_excel(
-                writer, sheet_name=key, startcol=3, header=True, index=False)
+            dfdictMaxValue.to_excel(writer, sheet_name=key, startcol=3, header=True, index=False)
 
         for key, value in dict_null_value.items():
             dfdictNullValue = pd.DataFrame(data=value, columns=[header[4]])
-            dfdictNullValue.to_excel(
-                writer, sheet_name=key, startcol=4, header=True, index=False)
+            dfdictNullValue.to_excel(writer, sheet_name=key, startcol=4, header=True, index=False)
 
         for key, value in dict_empty_value.items():
             dfdictEmptyValue = pd.DataFrame(data=value, columns=[header[5]])
-            dfdictEmptyValue.to_excel(
-                writer, sheet_name=key, startcol=5, header=True, index=False)
+            dfdictEmptyValue.to_excel(writer, sheet_name=key, startcol=5, header=True, index=False)
 
         for key, value in dict_total_valid_value.items():
-            dfdictTotalValidValue = pd.DataFrame(
-                data=value, columns=[header[6]])
-            dfdictTotalValidValue.to_excel(
-                writer, sheet_name=key, startcol=6, header=True, index=False)
+            dfdictTotalValidValue = pd.DataFrame(data=value, columns=[header[6]])
+            dfdictTotalValidValue.to_excel(writer, sheet_name=key, startcol=6, header=True, index=False)
 
         for key, value in dict_percentage_comp.items():
             dfdictMinValue = pd.DataFrame(data=value, columns=[header[7]])
-            dfdictMinValue.to_excel(
-                writer, sheet_name=key, startcol=7, header=True, index=False)
+            dfdictMinValue.to_excel(writer, sheet_name=key, startcol=7, header=True, index=False)
 
         for key, value in dict_category_of_data.items():
             dfdictMinValue = pd.DataFrame(data=value, columns=[header[8]])
-            dfdictMinValue.to_excel(
-                writer, sheet_name=key, startcol=8, header=True, index=False)
+            dfdictMinValue.to_excel(writer, sheet_name=key, startcol=8, header=True, index=False)
 
         for key, value in dict_total_values.items():
             dfdictMinValue = pd.DataFrame(data=value, columns=[header[9]])
-            dfdictMinValue.to_excel(
-                writer, sheet_name=key, startcol=9, header=True, index=False)
+            dfdictMinValue.to_excel(writer, sheet_name=key, startcol=9, header=True, index=False)
 
         for key, value in dict_total_columns_values.items():
             dfdictMinValue = pd.DataFrame(data=value, columns=[header[10]])
-            dfdictMinValue.to_excel(
-                writer, sheet_name=key, startcol=10, header=True, index=False)
+            dfdictMinValue.to_excel(writer, sheet_name=key, startcol=10, header=True, index=False)
 
         writer.close()
 
