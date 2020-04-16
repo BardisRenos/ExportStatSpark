@@ -113,7 +113,7 @@ class StatExport:
                 print(i, k, mssql_df.count(), avg_value, min_value, max_value, null_value, empty_value,
                       total_valid_values, percentage_completion, self.lis_of_types[k])
 
-    def File_Export(self, app_name, num_tables, table_size, dict_col_name, dict_avg_value, dict_min_value, dict_max_value,
+    def file_export(self, app_name, num_tables, table_size, dict_col_name, dict_avg_value, dict_min_value, dict_max_value,
                     dict_null_value,
                     dict_empty_value, dict_total_valid_value, dict_percentage_comp, dict_category_of_data,
                     dict_total_values, dict_total_columns_values):
@@ -195,5 +195,5 @@ class StatExport:
 
 if __name__ == '__main__':
     exp = StatExport()
-    exp.File_Export(StatExport.dict_Names, StatExport.dict_Size, StatExport.dict_Size_Tables, StatExport.dict_Col_Name, StatExport.dict_AVG_Value, StatExport.dict_MIN_value, StatExport.dict_MAX_Value,StatExport.dict_Null_Value, StatExport.dict_Empty_Value, StatExport.dict_Total_Valid_Value, StatExport.dict_Percentage_Comp, StatExport.dict_Category_Of_data, StatExport.dict_Total_Length_Values, StatExport.dict_Total_Length_Col_Values)
+    exp.file_export(StatExport.dict_Names, StatExport.dict_Size, StatExport.dict_Size_Tables, StatExport.dict_Col_Name, StatExport.dict_AVG_Value, StatExport.dict_MIN_value, StatExport.dict_MAX_Value,StatExport.dict_Null_Value, StatExport.dict_Empty_Value, StatExport.dict_Total_Valid_Value, StatExport.dict_Percentage_Comp, StatExport.dict_Category_Of_data, StatExport.dict_Total_Length_Values, StatExport.dict_Total_Length_Col_Values)
 
