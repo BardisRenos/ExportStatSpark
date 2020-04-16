@@ -51,14 +51,13 @@ class StatExport:
         self.dict_Size.update({"Size of Table": [size(sum * 1024, si)]})
 
     def extract_data(self):
-
         spark = SparkSession \
             .builder \
             .master("local") \
             .appName("Python Spark SQL basic example") \
             .config("spark.driver.extraClassPath",
-                    "C:\\Users\\renos.bardis\\PycharmProjects\\erp-mdm\\mssql-jdbc-7.4.1.jre8.jar:C:\\Users"
-                    "\\renos.bardis\\PycharmProjects\\erp-mdm\\sqljdbc_auth.dll") \
+                    "C:\\Users\\user\\PycharmProjects\\project\\mssql-jdbc-7.4.1.jre8.jar:C:\\Users"
+                    "\\user\\PycharmProjects\\project\\sqljdbc_auth.dll") \
             .config("spark.debug.maxToStringFields", 2000) \
             .getOrCreate()
 
