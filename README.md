@@ -6,7 +6,7 @@ This repository has a combination of Spark, Pandas and working with Excel files 
 
 ### Using the necessary libraries
 
-In t0he beginning of the code, we first import the necessary libraries. In order to complete the extraction of the data, there is the need to import pandas to create dataframes. The ***pyodbc*** to create a connection to the server database. Regarding Spark, we import spark function, will help us in further. 
+In t0he beginning of the code, we first import the necessary libraries. In order to complete the extraction of the data, there is the need to import pandas to create dataframes. The ***pyodbc*** creates a connection to the server database. Regarding Spark, we import spark function, will help us in further. 
 
 ```python
   import pandas as pd
@@ -73,7 +73,7 @@ To manage a large volume of database tables, spark can be a useful tool. The fir
           .getOrCreate()
 ```
 
-The second block has the configuration with the server database with windows authentication.
+The second block has the configuration with the server database with windows authentication. This code loops on every table name and each one of them is stored into ***mssql_df***. 
 
 ```python
     for i in self.the_main_tables()['name']:
@@ -85,12 +85,11 @@ The second block has the configuration with the server database with windows aut
 
 ### The exctraction steps.
 
-After making the connection with the database
+After making the connection with the databases.
 
 
 ```python
-
-for k in mssql_df.columns:
+  for k in mssql_df.columns:
     avg_value = str(mssql_df.select(
         avg(length(col(k)))).collect()[0][0])
     self.dict_AVG_Value.setdefault(i, []).append(
@@ -129,7 +128,6 @@ for k in mssql_df.columns:
 
     print(i, k, mssql_df.count(), avg_value, min_value, max_value, null_value, empty_value,
           total_valid_values, percentage_completion, self.lis_of_types[k])
-
 ```
 
 
