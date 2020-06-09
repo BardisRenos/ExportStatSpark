@@ -6,7 +6,7 @@ This repository has a combination of Spark, Pandas and working with Excel files 
 
 ### Using the necessary libraries
 
-In t0he beginning of the code, we first import the necessary libraries. In order to complete the extraction of the data, there is the need to import pandas to create dataframes. The ***pyodbc*** creates a connection to the server database. Regarding Spark, we import spark function, will help us in further. 
+At the beginning of the code, we first import the necessary libraries. In order to complete the extraction of the data, there is the need to import pandas to create dataframes. The ***pyodbc*** creates a connection to the server database. Regarding Spark, we import spark function, will help us in further. 
 
 ```python
   import pandas as pd
@@ -16,14 +16,15 @@ In t0he beginning of the code, we first import the necessary libraries. In order
   from hurry.filesize import size, si
 ```
 
-### Make the connection to the server database
+### Create a pipeline to the server database
 
-First the code starts with a new connection to the server database. 
+First the code starts with a new connection to the server database. Create=ing a pipeline with pyodbc library to a database server by giving the parameters and indicating that the connection is trusted. 
+
 ```python
   cnxn = pyodbc.connect(Driver='{SQL Server}', Server='SERVER_NAME', Database='DATABASE_NAME', Trusted_Connection='yes')
 ```
 
-The server database has a large number of databases. Therefore, the below query retrieves all table names that are below the tables subfolder of the server. Stored to pandas dataframe. Pandas library has the ability to run a sql query and retrieve the results and store them into a dataframe. 
+One server has normaly a large number of databases. Therefore, the below query retrieves all table names (only) that are below the table's sub folder of the server. Stored to a pandas dataframe. Pandas library has the ability to run a sql query and retrieve the results and store them into a dataframe format. 
 
 ```python
   def the_main_tables(self):
@@ -34,31 +35,9 @@ The server database has a large number of databases. Therefore, the below query 
     return df
 ```
 
-### Creating the "info" sheet.
-
-This block creates the ***info*** sheet that contains the overall information of all databases. For example, the frist column has the names of the column. The second column has the overall number on database tables. Last, the third column has the actual size in MB. 
-
-```python
-  def extraction_main_data(self):
-    df = self.the_main_tables()['name']
-    for i in df:
-        self.dict_Col_Name.setdefault("Col_Name", []).append(i)
-        df_re = pd.read_sql("EXEC sp_spaceused  [" + i + "]", self.cnxn)
-        self.dict_Size.update({i: df_re['data'].tolist()[0]})
-    sum = 0
-    for value in self.dict_Size.values():
-        sum += int(value.split(" ")[0])
-
-    self.dict_Size.clear()
-    self.dict_Names.update({"Application Name": ["E-Project"]})
-    self.dict_Size_Tables.update({"# of Tables": [len(df)]})
-    self.dict_Size.update({"Size of Table": [size(sum * 1024, si)]})
-```
-
-
 ### Configure the Spark environment 
 
-To manage a large volume of database tables, spark can be a useful tool. The first block create the spark session.  
+To manage a large volume of database tables, Spark can be a useful tool. The first block create the spark session.  
 
 ```python
  def extract_data(self):
@@ -73,7 +52,7 @@ To manage a large volume of database tables, spark can be a useful tool. The fir
           .getOrCreate()
 ```
 
-The second block has the configuration with the server database with windows authentication. This code loops on every table name and each one of them is stored into ***mssql_df***. 
+The second block has the configuration with the server database with windows authentication. This code loops on every table name and each one of them is stored into ***mssql_df***. The below code is configured to connect to jdbc (java database connector). Also, giving the sql server and the port for the connection. 
 
 ```python
     for i in self.the_main_tables()['name']:
@@ -92,33 +71,45 @@ After making the connection with the databases. The algorithm, applies 8 element
   
     avg_value = str(mssql_df.select(avg(length(col(k)))).collect()[0][0])
     self.dict_AVG_Value.setdefault(i, []).append(avg_value.split(".")[0])
-
+```
+```python
     min_value = mssql_df.select(min(length(col(k)))).collect()[0][0]
     self.dict_MIN_value.setdefault(i, []).append(min_value)
+```
 
+```python
     max_value = mssql_df.select(max(length(col(k)))).collect()[0][0]
     self.dict_MAX_Value.setdefault(i, []).append(max_value)
+```
 
+```python
     null_value = mssql_df.where(col(k).isNull()).count()
     self.dict_Null_Value.setdefault(i, []).append(null_value)
+```
 
+```python
     empty_value = mssql_df.where(length(col(k)) == 0).count()
     self.dict_Empty_Value.setdefault(i, []).append(empty_value)
+```
 
+```python
     total_valid_values = mssql_df.count() - (empty_value + null_value)
     self.dict_Total_Valid_Value.setdefault(i, []).append(total_valid_values)
+```
 
+```python
     percentage_completion = ((total_valid_values / mssql_df.count()) * 100) if mssql_df.count() != 0 else 0
     self.dict_Percentage_Comp.setdefault(i, []).append(int(percentage_completion))
+```
 
+```python
     type_value = self.lis_of_types[k]
     self.dict_Category_Of_data.setdefault(i, []).append(type_value)
+```
 
+```python
     self.dict_Total_Length_Values.setdefault(i, []).append(mssql_df.count())
     self.dict_Total_Length_Col_Values.setdefault(i, []).append(len(mssql_df.columns))
-
-    print(i, k, mssql_df.count(), avg_value, min_value, max_value, null_value, empty_value,
-          total_valid_values, percentage_completion, self.lis_of_types[k])
 ```
 
 
@@ -128,24 +119,7 @@ This bloc shows how the data from the above code bloc.
 
 ```python
 
-def file_export(self, app_name, num_tables, table_size, dict_col_name, dict_avg_value, dict_min_value, dict_max_value,
-                    dict_null_value, dict_empty_value, dict_total_valid_value, dict_percentage_comp, dict_category_of_data,
-                    dict_total_values, dict_total_columns_values):
-
-    self.extract_data()
-    
-# The dictAll (dictionary type) contains the three main statistical data. 
-
-    dictAll = {}
-    dictAll.update(app_name)
-    dictAll.update(num_tables)
-    dictAll.update(table_size)
-
 # Using the ExcelWriter method from Pandas library it is possible to export a dataframe into excel file. The three previous dictionaries # are merge into a single one and then exported into an axcel file.  
-
-    writer = pd.ExcelWriter(r'C:\Users\user\Desktop\project\file_name.xlsx')
-    dfTotal = pd.DataFrame(data=dictAll)
-    dfTotal.to_excel(writer, index=None, header=True, sheet_name="Info")
 
     header = ["Column_Name", "AVG_Value", "Min_Value", "Max_Value", "Null_Fields",
               "Empty_Fields", "Total_Valid_Values", "Percentage_Of_Completion", "Data_Type",
