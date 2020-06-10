@@ -37,7 +37,7 @@ One server has normaly a large number of databases. Therefore, the below query r
 
 ### Configure the Spark environment 
 
-To manage a large volume of database tables, Spark can be a useful tool. The first block create the spark session.  
+To manage a large volume of database tables, Spark can be a useful tool. The first block create the spark session to my local machine.  
 
 ```python
  def extract_data(self):
@@ -52,7 +52,7 @@ To manage a large volume of database tables, Spark can be a useful tool. The fir
           .getOrCreate()
 ```
 
-The second block has the configuration with the server database with windows authentication. This code loops on every table name and each one of them is stored into ***mssql_df***. The below code is configured to connect to jdbc (java database connector). Also, giving the sql server and the port for the connection. 
+The second block has the configuration with the server database with windows authentication. This code loops over the previous dataframe ***sqlTables***. Every table name is stored into ***mssql_df***. The below code is configured to connect to jdbc (java database connector). Also, giving the sql server and the port for the connection. 
 
 ```python
     for i in self.the_main_tables()['name']:
@@ -64,7 +64,9 @@ The second block has the configuration with the server database with windows aut
 
 ### The exctraction steps.
 
-After making the connection with the databases. The algorithm, applies 8 elements of data stat. For example, the code extracts the average length value (***avg_value***), the minimum length value (***min_value***), the maximum length value (***max_value***), the number of NULL values that a column may contains (***null_values***). Moreover, the number of empty values (***empty_value***) which a column may contains. This method also contains the total valid values of each column (***total_valid_values***). Is followed by the percentage of completion, which depicts how much a column is fulfil. Another feature is the type of the column and lastly, the length of the column.
+After making the connection with the databases. The algorithm, applies 7 elements of data stat. For example, the code extracts the average length value (***avg_value***), the minimum length value (***min_value***), the maximum length value (***max_value***), the number of NULL values that a column may contains (***null_values***). Moreover, the number of empty values (***empty_value***) which a column may contains. This method also contains the total valid values of each column (***total_valid_values***). Is followed by the ***percentage of completion***, which depicts how much a column is fulfil. Another feature is the type of the column and lastly, the length of the column.
+
+Here the code starts with the loop on top of all columns. By each column the code calculates and stores into a dictionary. For example, in the first block, calculates the average length character of the first column. After that, stored it into a key value storage.  
 
 ```python
   for k in mssql_df.columns:
