@@ -74,6 +74,8 @@ Here the code starts with the loop on top of all columns. By each column the cod
     avg_value = str(mssql_df.select(avg(length(col(k)))).collect()[0][0])
     self.dict_AVG_Value.setdefault(i, []).append(avg_value.split(".")[0])
 ```
+In the second block. calculates the minimum length character of the same column.
+
 ```python
     min_value = mssql_df.select(min(length(col(k)))).collect()[0][0]
     self.dict_MIN_value.setdefault(i, []).append(min_value)
