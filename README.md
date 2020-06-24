@@ -74,32 +74,42 @@ Here the code starts with the loop on top of all columns. By each column the cod
     avg_value = str(mssql_df.select(avg(length(col(k)))).collect()[0][0])
     self.dict_AVG_Value.setdefault(i, []).append(avg_value.split(".")[0])
 ```
-In the second block. calculates the minimum length character of the same column.
+In the second block. The code calculates the minimum length character of the same column.
 
 ```python
     min_value = mssql_df.select(min(length(col(k)))).collect()[0][0]
     self.dict_MIN_value.setdefault(i, []).append(min_value)
 ```
 
+In followed block, the code calculates the maximum length character of the aforementioned column. 
+
 ```python
     max_value = mssql_df.select(max(length(col(k)))).collect()[0][0]
     self.dict_MAX_Value.setdefault(i, []).append(max_value)
 ```
+
+Counts how many cells has null values.
 
 ```python
     null_value = mssql_df.where(col(k).isNull()).count()
     self.dict_Null_Value.setdefault(i, []).append(null_value)
 ```
 
+Also, the code counts the empty fields.
+
 ```python
     empty_value = mssql_df.where(length(col(k)) == 0).count()
     self.dict_Empty_Value.setdefault(i, []).append(empty_value)
 ```
 
+Here the code counts number of cells of the column that are not empty or null.
+
 ```python
     total_valid_values = mssql_df.count() - (empty_value + null_value)
     self.dict_Total_Valid_Value.setdefault(i, []).append(total_valid_values)
 ```
+
+Calculates the percentage of the valid values (non null values or empty ones)
 
 ```python
     percentage_completion = ((total_valid_values / mssql_df.count()) * 100) if mssql_df.count() != 0 else 0
@@ -114,67 +124,6 @@ In the second block. calculates the minimum length character of the same column.
 ```python
     self.dict_Total_Length_Values.setdefault(i, []).append(mssql_df.count())
     self.dict_Total_Length_Col_Values.setdefault(i, []).append(len(mssql_df.columns))
-```
-
-
-### The data exportation into excel sheet
-
-This bloc shows how the data from the above code bloc.  
-
-```python
-
-# Using the ExcelWriter method from Pandas library it is possible to export a dataframe into excel file. The three previous dictionaries # are merge into a single one and then exported into an axcel file.  
-
-    header = ["Column_Name", "AVG_Value", "Min_Value", "Max_Value", "Null_Fields",
-              "Empty_Fields", "Total_Valid_Values", "Percentage_Of_Completion", "Data_Type",
-              "Row_Length", "Column_Size"]
-
-    for key, value in dict_col_name.items():
-        dfdictColName = pd.DataFrame(data=value, columns=[header[0]])
-        dfdictColName.to_excel(writer, sheet_name=key, startcol=0, header=True, index=False)
-
-    for key, value in dict_avg_value.items():
-        dfdictAvgValue = pd.DataFrame(data=value, columns=[header[1]])
-        dfdictAvgValue.to_excel(writer, sheet_name=key, startcol=1, header=True, index=False)
-
-    for key, value in dict_min_value.items():
-        dfdictMinValue = pd.DataFrame(data=value, columns=[header[2]])
-        dfdictMinValue.to_excel(writer, sheet_name=key, startcol=2, header=True, index=False)
-
-    for key, value in dict_max_value.items():
-        dfdictMaxValue = pd.DataFrame(data=value, columns=[header[3]])
-        dfdictMaxValue.to_excel(writer, sheet_name=key, startcol=3, header=True, index=False)
-
-    for key, value in dict_null_value.items():
-        dfdictNullValue = pd.DataFrame(data=value, columns=[header[4]])
-        dfdictNullValue.to_excel(writer, sheet_name=key, startcol=4, header=True, index=False)
-
-    for key, value in dict_empty_value.items():
-        dfdictEmptyValue = pd.DataFrame(data=value, columns=[header[5]])
-        dfdictEmptyValue.to_excel(writer, sheet_name=key, startcol=5, header=True, index=False)
-
-    for key, value in dict_total_valid_value.items():
-        dfdictTotalValidValue = pd.DataFrame(data=value, columns=[header[6]])
-        dfdictTotalValidValue.to_excel(writer, sheet_name=key, startcol=6, header=True, index=False)
-
-    for key, value in dict_percentage_comp.items():
-        dfdictMinValue = pd.DataFrame(data=value, columns=[header[7]])
-        dfdictMinValue.to_excel(writer, sheet_name=key, startcol=7, header=True, index=False)
-
-    for key, value in dict_category_of_data.items():
-        dfdictMinValue = pd.DataFrame(data=value, columns=[header[8]])
-        dfdictMinValue.to_excel(writer, sheet_name=key, startcol=8, header=True, index=False)
-
-    for key, value in dict_total_values.items():
-        dfdictMinValue = pd.DataFrame(data=value, columns=[header[9]])
-        dfdictMinValue.to_excel(writer, sheet_name=key, startcol=9, header=True, index=False)
-
-    for key, value in dict_total_columns_values.items():
-        dfdictMinValue = pd.DataFrame(data=value, columns=[header[10]])
-        dfdictMinValue.to_excel(writer, sheet_name=key, startcol=10, header=True, index=False)
-
-    writer.close()
-
 ```
 
 
